@@ -133,6 +133,37 @@ export function DashboardPage() {
           </div>
         )}
 
+        {/* 2б. Профиль есть, но OpenDota не отдаёт историю матчей (сбой на их стороне) */}
+        {!heroes.isError && !profile.isError && profile.data?.profile && matches.isError && !matches.data && (
+          <>
+            <PlayerHeader
+              accountId={accountId}
+              player={profile.data}
+              analyzed={0}
+              matchLimit={matchLimit}
+              onMatchLimitChange={setMatchLimit}
+              isFetchingMatches={matches.isFetching}
+            />
+            <div className="card p-6 text-center">
+              <AlertTriangle className="mx-auto mb-3 h-8 w-8 text-win-mid" />
+              <h2 className="text-lg font-bold">OpenDota временно не отдаёт историю матчей</h2>
+              <p className="mx-auto mt-2 max-w-lg text-fg-muted">
+                Профиль найден, но сервер OpenDota сейчас отвечает ошибкой на запрос матчей
+                {(matches.error as Error)?.message ? ` (${(matches.error as Error).message})` : ''}. Это сбой на стороне
+                OpenDota, а не DraftLens и не твоего аккаунта. Обычно это проходит само за несколько минут или часов.
+              </p>
+              <button
+                type="button"
+                onClick={() => matches.refetch()}
+                disabled={matches.isFetching}
+                className="btn-primary mt-4"
+              >
+                {matches.isFetching ? 'Пробуем снова…' : 'Попробовать снова'}
+              </button>
+            </div>
+          </>
+        )}
+
         {/* 3. Профиль не найден */}
         {notFound && !profile.isError && (
           <div className="card p-8 text-center">
